@@ -1,22 +1,52 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 import InputField from "@/components/input-field/InputField";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const signup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {signUp, isLoading} = useAuth();
+
+  const handleSignUp = async () => {
+    if (!fullName.trim() || !email.trim() || !password) {
+      Toast.show({
+        type: "error",
+        text1: "Missing information",
+        text2: "Please complete all fields.",
+      });
+      return;
+    }
+
+    try {
+      await signUp(fullName, email, password);
+      Toast.show({
+        type: "success",
+        text1: "Account created",
+        text2: "Welcome to KampusL&F!",
+      });
+      router.replace("/(tabs)");
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Sign up failed",
+        text2: error instanceof Error ? error.message : "Please try again.",
+      });
+    }
+  }
 
   return (
-    <View className="flex-1 bg-secondary px-5 pt-16">
-      <View className="mb-8">
-        <Text className="text-3xl font-bold text-slate-900">Create account</Text>
-        <Text className="mt-2 text-base text-optional">Sign up to continue</Text>
+    <View className="flex-1 bg-secondary px-5 pt-16 items-center justify-center">
+      <View className="mb-8 gap-4">
+        <Text className="text-4xl text-brand font-extrabold">Welcome to KampusL&F</Text>
+        <Text className="text-3xl font-bold text-slate-900 text-center">Create account</Text>
       </View>
 
-      <View className="rounded-3xl border border-brand bg-secondary p-5 shadow-sm">
+      <View className="bg-secondary p-5 w-full">
         <View className="gap-4">
           <InputField
             label="Full name"
@@ -48,8 +78,11 @@ const signup = () => {
           />
         </View>
 
-        <Pressable className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3.5">
-          <Text className="text-base font-semibold text-secondary">Sign Up</Text>
+        <Pressable 
+          onPress={handleSignUp}
+          disabled={isLoading}
+          className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3.5">
+            <Text className="text-base font-semibold text-black">Sign Up</Text>
         </Pressable>
 
         <View className="mt-5 flex-row items-center justify-center gap-1">
