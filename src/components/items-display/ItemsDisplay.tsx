@@ -124,7 +124,7 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
   );
 
   return (
-    <View className="flex-1 relative">
+    <View className="flex-1 relative pt-4">
       <FlatList
         style={{ flex: 1 }}
         data={displayedItems}
@@ -133,7 +133,7 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
         contentContainerStyle={{
           paddingHorizontal: 2,
           paddingTop: 16,
-          paddingBottom: 16,
+          paddingBottom: 26,
           gap: 12,
           flexGrow: 1,
         }}

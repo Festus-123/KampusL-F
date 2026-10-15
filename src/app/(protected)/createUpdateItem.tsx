@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import InputField from "@/components/input-field/InputField";
 import { useItems } from "@/hooks/items/useItems";
 import Toast from "react-native-toast-message";
+import Loading from "@/components/loading/Loading";
 
 export default function CreateUpdateItem() {
   const { createLostItem, getLostItemById, updateLostItem, isLoading } =
@@ -175,7 +176,7 @@ export default function CreateUpdateItem() {
           className={`min-h-12 items-center justify-center rounded-xl px-4 ${isBusy ? "bg-slate-300" : "bg-brand"}`}
         >
           {isBusy ? (
-            <ActivityIndicator color="#0f172a" />
+            <Loading />
           ) : (
             <Text className="font-semibold text-slate-900">
               {itemId ? "Save changes" : "Create item"}

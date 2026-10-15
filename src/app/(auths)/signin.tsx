@@ -77,7 +77,7 @@ const signin = () => {
         <Pressable 
           onPress={handleSignIn}
           disabled={isLoading}
-          className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3.5">
+          className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3">
             {isLoading ? (
               <Loading />
             ) : (
