@@ -1,17 +1,18 @@
-import { Stack } from "expo-router";
 import AuthProvider from "@/context/auth/AuthProvider";
+import ItemsProvider from "@/context/items/ItemsProvider";
+import RootNavigation from "@/lib/navigation/RootNavigation";
 import Toast from "react-native-toast-message";
 import "./global.css";
+
+
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auths)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-      <Toast />
+      <ItemsProvider>
+        <RootNavigation />
+        <Toast />
+      </ItemsProvider>
     </AuthProvider>
   );
 }

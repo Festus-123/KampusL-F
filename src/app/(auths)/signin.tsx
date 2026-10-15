@@ -1,15 +1,18 @@
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
 import InputField from "@/components/input-field/InputField";
 import { useAuth } from "@/hooks/auth/useAuth";
 import Toast from "react-native-toast-message";
+import Loading from "@/components/loading/Loading";
 
 const signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, isLoading, user } = useAuth();
+  const { continueToCreate } = useLocalSearchParams<{ continueToCreate?: string}>();
 
   const handleSignIn = async () => {
     if(!email.trim() && !password){
@@ -27,7 +30,10 @@ const signin = () => {
         text1: `Welcome Back ${user?.name}`,
         text2: "Explore KampusL&F!"
       })
-      router.replace('/(tabs)')
+      router.replace(
+        continueToCreate === "1"
+        ? '/(tabs)/add'
+        : '/(tabs)')
     } catch (error) {
       Toast.show({
         type: "error",
@@ -72,7 +78,11 @@ const signin = () => {
           onPress={handleSignIn}
           disabled={isLoading}
           className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3.5">
-          <Text className="text-base font-semibold text-black">Sign Up</Text>
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <Text className="text-base font-semibold text-black">Sign In</Text>
+            )}
         </Pressable>
 
         <View className="mt-5 flex-row items-center justify-center gap-1">

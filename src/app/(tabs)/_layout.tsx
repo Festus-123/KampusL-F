@@ -1,27 +1,8 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { Tabs } from "expo-router";
-import { BlurView } from "expo-blur";
-import AuthProvider from "@/context/auth/AuthProvider";
-import { useAuth } from "@/hooks/auth/useAuth";
-import PopUps from "@/components/pop-up/PopUps";
-
 
 export default function TabLayout() {
-    const { user, isLoading } = useAuth();
-
-  // if(isLoading){
-    
-  // }
-
-  if (!user) {
-    return (
-      <PopUps
-      message='You aren&apos;t signed in yet!, join this community to help items get recollected'
-      isType='message'
-      directTo='/(auths)/signup'
-      buttonLabel='Signup'/>
-    )
-  }
   return (
     <>
         <Tabs
@@ -40,6 +21,16 @@ export default function TabLayout() {
               tabBarIcon: ({ color }) => (
                 <FontAwesome size={28} name="home" color={color} />
               ),
+            }}
+          />
+          <Tabs.Screen 
+            name="add"
+            options={{
+              headerShown: false,
+              title: "Add item",
+              tabBarIcon: ({color}) => (
+                <AntDesign name="appstore-add" size={24} color="black" />
+              )
             }}
           />
           <Tabs.Screen

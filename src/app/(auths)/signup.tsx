@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 
 import InputField from "@/components/input-field/InputField";
 import { useAuth } from "@/hooks/auth/useAuth";
+import Loading from "@/components/loading/Loading";
 
 const signup = () => {
   const [fullName, setFullName] = useState("");
@@ -82,7 +83,11 @@ const signup = () => {
           onPress={handleSignUp}
           disabled={isLoading}
           className="mt-6 items-center justify-center rounded-xl bg-brand px-4 py-3.5">
-            <Text className="text-base font-semibold text-black">Sign Up</Text>
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <Text className="text-base font-semibold text-black">Sign Up</Text>
+            )}
         </Pressable>
 
         <View className="mt-5 flex-row items-center justify-center gap-1">

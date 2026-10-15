@@ -1,22 +1,18 @@
 
 
 import React, { useState } from 'react'
-import { Text, View } from 'react-native'
-import HeaderBadge from '@/components/header-badge/HeaderBadge'
-import PopUps from '@/components/pop-up/PopUps'
-import { useAuth } from '@/hooks/auth/useAuth'
+import HeaderBadge from "@/components/header-badge/HeaderBadge";
+import ItemsDisplay from "@/components/items-display/ItemsDisplay";
+import ScoreBoard from "@/components/score-board/ScoreBoard";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const index = () => {
-
-
+export default function Index() {
   return (
-    <View className='flex-1 py-12 px-4'>
+    <SafeAreaView className='flex-1 py-8 px-4'>
         {/* Header section */}
         <HeaderBadge />
-
-
-    </View>
-  )
+        <ScoreBoard />
+        <ItemsDisplay />
+    </SafeAreaView>
+  );
 }
-
-export default index
