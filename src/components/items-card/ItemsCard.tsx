@@ -8,6 +8,7 @@ type ItemsCardProps = {
   isOwner?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  onClickReclaim: () => void;
 };
 
 const ItemsCard = ({
@@ -15,7 +16,9 @@ const ItemsCard = ({
   isOwner = false,
   onEdit,
   onDelete,
+  onClickReclaim
 }: ItemsCardProps) => {
+
   return (
     <View className="w-full overflow-hidden flex-row items-center gap-3 p-2 rounded-xl border-[0.3px]">
       <View className="h-24 w-24 overflow-hidden rounded-lg bg-slate-100">
@@ -79,8 +82,7 @@ const ItemsCard = ({
         ) : (
           <Pressable
             accessibilityRole="button"
-            accessibilityState={{ disabled: true }}
-            disabled
+            onPress={onClickReclaim}
             className="mt-1 self-start rounded-xl bg-brand p-2 items-center"
           >
             <Text className="text-xs font-semibold text-secondary">Reclaim</Text>

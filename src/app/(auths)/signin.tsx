@@ -33,7 +33,7 @@ const signin = () => {
       router.replace(
         continueToCreate === "1"
         ? '/(tabs)/add'
-        : '/(tabs)')
+        : continueToCreate === "2" ? '/(request)/createRequest' : '/(tabs)')
     } catch (error) {
       Toast.show({
         type: "error",

@@ -13,6 +13,7 @@ import type { LostItem } from "@/context/items/itemsContext";
 import { useItems } from "@/hooks/items/useItems";
 import Loading from "../loading/Loading";
 import PopUps from "../pop-up/PopUps";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const PAGE_SIZE = 12;
 
@@ -20,11 +21,21 @@ type ItemsDisplayProps = {
   mode?: "public" | "mine";
 };
 
+type ReclaimState = {
+  state: boolean | null;
+  id: number | null;
+}
+
 const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
+  const {user, accessToken} = useAuth();
+  const [isReclaiming, setIsReclaiming] = useState<ReclaimState>({
+    state: false,
+    id: null
+  });
+
   const { items, myItems, getLostItemsPage, getMyLostItems, deleteLostItem } =
     useItems();
   const router = useRouter();
-  //   const tabBarHeight = useBottomTabBarHeight();
   const displayedItems = mode === "mine" ? myItems : items;
   const nextOffset = useRef(0);
   const isFetching = useRef(false);
@@ -106,6 +117,22 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
     setDeleteItemId(id);
   }, []);
 
+  const checkStateForReclaim = (itemId: number) => {
+    if(!user && !accessToken) {
+      setIsReclaiming({ state: true, id: itemId})
+      return;
+    }
+
+    router.push({
+      pathname: "/(request)/createRequest",
+      params: {
+        id: String(itemId)
+      }
+    })
+
+    setIsReclaiming({ state: null, id: null})
+  }
+
   const renderItem = useCallback(
     ({ item }: { item: LostItem }) => (
       <ItemsCard
@@ -118,10 +145,12 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
           })
         }
         onDelete={() => handleDelete(item.id)}
+        onClickReclaim={() => checkStateForReclaim(item.id)}
       />
     ),
     [handleDelete, mode, router],
   );
+
 
   return (
     <View className="flex-1 relative pt-4">
@@ -204,6 +233,25 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
           cancelLabel="Cancel"
           onCancel={() => setDeleteItemId(null)}
         />
+      )}
+
+      { isReclaiming.state == true && (
+        <PopUps
+        buttonLabel="Proceed"
+        cancelLabel="Return"
+        isType="message"
+        message="You aren't authorized to access this feature. Sign in to have access"
+        onCancel={() => setIsReclaiming({ ...isReclaiming, state: false})}
+        directTo={() => {
+          router.push({
+            pathname: "/(auths)/signin",
+            params : {
+              continueToCreate: "2",
+              itemId: isReclaiming.id
+            }
+          })
+        }}
+      />
       )}
     </View>
   );
