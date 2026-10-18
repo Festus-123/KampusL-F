@@ -14,6 +14,7 @@ import { useItems } from "@/hooks/items/useItems";
 import Loading from "../loading/Loading";
 import PopUps from "../pop-up/PopUps";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useRequest } from "@/hooks/requests/userRequest";
 
 const PAGE_SIZE = 12;
 
@@ -35,6 +36,8 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
 
   const { items, myItems, getLostItemsPage, getMyLostItems, deleteLostItem } =
     useItems();
+
+  const {requests} = useRequest();
   const router = useRouter();
   const displayedItems = mode === "mine" ? myItems : items;
   const nextOffset = useRef(0);
@@ -117,8 +120,12 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
     setDeleteItemId(id);
   }, []);
 
+    const itemKnownId = new Set(items.map((item) => item.id))
+  const requestCountForItem = requests.filter((req) => 
+    itemKnownId.has(req.item_id)).length;
+
   const checkStateForReclaim = (itemId: number) => {
-    if(!user && !accessToken) {
+    if (!user || !accessToken) {
       setIsReclaiming({ state: true, id: itemId})
       return;
     }
@@ -129,8 +136,8 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
         id: String(itemId)
       }
     })
-
-    setIsReclaiming({ state: null, id: null})
+    
+    // setIsReclaiming({ state: null, id: null})
   }
 
   const renderItem = useCallback(
@@ -146,10 +153,12 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
         }
         onDelete={() => handleDelete(item.id)}
         onClickReclaim={() => checkStateForReclaim(item.id)}
+        requestCountOfItem={requestCountForItem}
       />
     ),
-    [handleDelete, mode, router],
+    [accessToken, handleDelete, mode, router, user],
   );
+
 
 
   return (

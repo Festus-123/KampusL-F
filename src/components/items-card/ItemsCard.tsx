@@ -9,6 +9,7 @@ type ItemsCardProps = {
   onEdit?: () => void;
   onDelete?: () => void;
   onClickReclaim: () => void;
+  requestCountOfItem: number;
 };
 
 const ItemsCard = ({
@@ -16,11 +17,14 @@ const ItemsCard = ({
   isOwner = false,
   onEdit,
   onDelete,
-  onClickReclaim
+  onClickReclaim,
+  requestCountOfItem
 }: ItemsCardProps) => {
 
   return (
-    <View className="w-full overflow-hidden flex-row items-center gap-3 p-2 rounded-xl border-[0.3px]">
+    <View className="w-full overflow-hidden rounded-xl border-[0.3px]">
+      <View className="flex-row items-center gap-3 p-2 w-full">
+
       <View className="h-24 w-24 overflow-hidden rounded-lg bg-slate-100">
         {item.image ? (
           <Image
@@ -89,6 +93,18 @@ const ItemsCard = ({
           </Pressable>
         )}
       </View>
+      </View>
+        <View className="w-full p-1 items-end">
+        { isOwner ? (
+          <Pressable>
+            <Text>Request Count For This Item {" "} {requestCountOfItem}</Text>
+          </Pressable>
+        ) : (
+          <View> 
+              <Text className={`${requestCountOfItem === 0 ? "text-red-600" : "text-green-500"} text-xs italic`}>Requests count for this item {" "} {requestCountOfItem}</Text>
+          </View>
+        )}
+        </View>
     </View>
   );
 };

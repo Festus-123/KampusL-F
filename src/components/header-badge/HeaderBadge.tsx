@@ -7,7 +7,7 @@ const HeaderBadge = () => {
     <View className="p-4 w-max flex flex-row justify-between ">
       <Text className="text-[2rem] font-sans font-extrabold ">KampusL&F</Text>
       <TouchableOpacity className="relative">
-        <Link href="/">
+        <Link href="/(profile)/profile">
           <Ionicons
             name="person-circle-outline"
             size={28}
