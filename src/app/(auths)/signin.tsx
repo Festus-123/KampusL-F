@@ -12,7 +12,7 @@ const signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, isLoading, user } = useAuth();
-  const { continueToCreate } = useLocalSearchParams<{ continueToCreate?: string}>();
+  const { continueToCreate, continueToProfile } = useLocalSearchParams<{ continueToCreate?: string, continueToProfile?: string}>();
 
   const handleSignIn = async () => {
     if(!email.trim() && !password){
@@ -33,7 +33,8 @@ const signin = () => {
       router.replace(
         continueToCreate === "1"
         ? '/(tabs)/add'
-        : continueToCreate === "2" ? '/(request)/createRequest' : '/(tabs)')
+        : continueToCreate === "2" ? '/(request)/createRequest' 
+        : continueToProfile === "1" ? "/(profile)/profile" : '/(tabs)')
     } catch (error) {
       Toast.show({
         type: "error",

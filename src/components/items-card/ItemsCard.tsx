@@ -97,7 +97,7 @@ const ItemsCard = ({
         <View className="w-full p-1 items-end">
         { isOwner ? (
           <Pressable>
-            <Text>Request Count For This Item {" "} {requestCountOfItem}</Text>
+            <Text className="text-xs italic">Request Count For This Item {" "} {requestCountOfItem}</Text>
           </Pressable>
         ) : (
           <View> 

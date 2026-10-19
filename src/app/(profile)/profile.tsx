@@ -3,28 +3,32 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { useItems } from "@/hooks/items/useItems";
 import { useRequest } from "@/hooks/requests/userRequest";
 import React, { useEffect } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Feather from "@expo/vector-icons/Feather";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { Link, router } from "expo-router";
+import Toast from "react-native-toast-message";
 
 const profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { myItems, getMyLostItems } = useItems();
-  const { requests, getAllRequests } = useRequest();
+  const { requests } = useRequest();
 
   useEffect(() => {
     const loadProfileStats = async () => {
       try {
-        await Promise.all([getMyLostItems(), getAllRequests()]);
+        await getMyLostItems();
       } catch (error) {
         console.error("Failed to load profile stats:", error);
       }
     };
 
     void loadProfileStats();
-  }, [getAllRequests, getMyLostItems]);
+  }, [getMyLostItems]);
 
   const getFirstLetter = (word: string | undefined) => {
     if (!word) return;
@@ -38,15 +42,32 @@ const profile = () => {
     ownedItemIds.has(request.item_id),
   ).length;
 
+  const handleSignout = async () => {
+    try {
+      signOut();
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Sign out Failed",
+        text2: "Try again please",
+      });
+      throw new Error("Error Signing out");
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 p-4 items-center justify-center">
+    <SafeAreaView className="flex-1 p-4 items-center">
       {/* profile logo */}
-      <View className="text-9xl rounded-full p-6 bg-brand text-black">
-        <Text>{getFirstLetter(user?.name)}</Text>
+      <View className="h-40 w-40 items-center justify-center rounded-full bg-brand mb-2">
+        <Text className="text-8xl font-bold text-black">
+          {getFirstLetter(user?.name)}
+        </Text>
       </View>
       {/* Profile deyails  */}
       <Text className="text-4xl font-bold">{user?.name}</Text>
-      <Text className="text-xl font-bold tracking-widest">{user?.email}</Text>
+      <Text className="text-xl font-light tracking-widest mb-4">
+        {user?.email}
+      </Text>
 
       <View className="mt-8 w-full flex flex-row items-center gap-4 justify-center">
         <View className="flex flex-col items-center gap-2">
@@ -63,6 +84,41 @@ const profile = () => {
           <EvilIcons name="like" size={24} color="black" />
           <Text className="text-lg">Likes: 0</Text>
         </View>
+      </View>
+
+      {/* path to operations */}
+      <View className="w-full items-start gap=2 p-2 mt-6">
+        <Pressable
+          onPress={() => router.push({ pathname: "/(profile)/myRequests" })}
+          className="p-4 border-b border-[0.1] w-full flex flex-row items-center gap-4"
+        >
+          <Feather name="git-pull-request" size={24} color="black" />
+          <Text className="text-2xl text-black">My Requests</Text>
+        </Pressable>
+
+        <Pressable
+          disabled
+          className="p-4 opacity-50 border-b boder-[0.1px] w-full flex flex-row item-center gap-4"
+        >
+          <AntDesign name="notification" size={24} color="black" />
+          <Text className="text-2xl text-black">Notifications</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push({ pathname: "/(profile)/reclaimers" })}
+          className="p-4 border-b border-[0.1] w-full flex flex-row items-center gap-4"
+        >
+          <Ionicons name="people-outline" size={24} color="black" />
+          <Text className="text-2xl text-black">Reclaimers</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={handleSignout}
+          className="p-4 border-b border-[0.1] w-full flex flex-row items-center gap-4"
+        >
+          <MaterialIcons name="logout" size={24} color="black" />
+          <Text className="text-2xl text-red-600">Sign Out</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

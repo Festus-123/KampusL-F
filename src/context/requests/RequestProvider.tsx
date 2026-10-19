@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
 import {
   requestContext,
@@ -13,6 +13,9 @@ export default function RequestProvider({ children }: { children: ReactNode }) {
   const { accessToken } = useAuth();
   const [requests, setRequests] = useState<requestObject[]>([]);
   const [myRequests, setMyRequests] = useState<requestObject[]>([]);
+  const [requestsForMyItems, setRequestsForMyItems] = useState<requestObject[]>(
+    [],
+  );
   const [totalReqCount, setTotalReqCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,19 +65,29 @@ export default function RequestProvider({ children }: { children: ReactNode }) {
   );
 
   const getAllRequests = useCallback(async () => {
-    const result = await request<requestObject[] | requestObject>("");
-    const requestList = Array.isArray(result) ? result : [result];
+    const requestList = await request<requestObject[]>("");
     setRequests(requestList);
     setTotalReqCount(requestList.length);
     return requestList;
   }, [request]);
 
   const getMyRequests = useCallback(async () => {
-    const result = await request<requestObject[] | requestObject>("/byUser");
-    const requestList = Array.isArray(result) ? result : [result];
+    const requestList = await request<requestObject[]>("/byUser");
     setMyRequests(requestList);
     return requestList;
   }, [request]);
+
+  const getRequestsForMyItems = useCallback(async () => {
+    const requestList = await request<requestObject[]>("/byOwner");
+    setRequestsForMyItems(requestList);
+    return requestList;
+  }, [request]);
+
+  useEffect(() => {
+    void getAllRequests().catch((error) => {
+      console.error("Failed to load requests:", error);
+    });
+  }, [getAllRequests]);
 
   const getRequestById = useCallback(
     (id: number) => {
@@ -113,19 +126,78 @@ export default function RequestProvider({ children }: { children: ReactNode }) {
     [request],
   );
 
+  const markRequestReclaimed = useCallback(
+    async (id: number) => {
+      const updatedRequest = await request<requestObject>(
+        `/${id}/status`,
+        "PATCH",
+        { status: "reclaimed" },
+      );
+      setRequests((currentRequests) =>
+        currentRequests.map((item) => (item.id === id ? updatedRequest : item)),
+      );
+      setMyRequests((currentRequests) =>
+        currentRequests.map((item) => (item.id === id ? updatedRequest : item)),
+      );
+      return updatedRequest;
+    },
+    [request],
+  );
+
+  const setOwnerRequestStatus = useCallback(
+    async (id: number, status: "returning" | "pending") => {
+      const updatedRequest = await request<requestObject>(
+        `/${id}/owner-status`,
+        "PATCH",
+        { status },
+      );
+      setRequestsForMyItems((currentRequests) =>
+        currentRequests.map((item) => (item.id === id ? updatedRequest : item)),
+      );
+      setRequests((currentRequests) =>
+        currentRequests.map((item) => (item.id === id ? updatedRequest : item)),
+      );
+      return updatedRequest;
+    },
+    [request],
+  );
+
+  const denyOwnerRequest = useCallback(
+    async (id: number) => {
+      const deletedRequest = await request<requestObject>(
+        `/${id}/owner`,
+        "DELETE",
+      );
+      setRequestsForMyItems((currentRequests) =>
+        currentRequests.filter((item) => item.id !== id),
+      );
+      setRequests((currentRequests) =>
+        currentRequests.filter((item) => item.id !== id),
+      );
+      setTotalReqCount((count) => Math.max(0, count - 1));
+      return deletedRequest;
+    },
+    [request],
+  );
+
   return (
     <requestContext.Provider
       value={
         {
           requests,
           myRequests,
+          requestsForMyItems,
           isLoading,
           totalReqCount,
           getAllRequests,
           getMyRequests,
+          getRequestsForMyItems,
           getRequestById,
           createRequest,
           deleteRequest,
+          markRequestReclaimed,
+          setOwnerRequestStatus,
+          denyOwnerRequest,
         } satisfies requestContextValue
       }
     >
