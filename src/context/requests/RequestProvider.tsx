@@ -10,7 +10,7 @@ import {
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function RequestProvider({ children }: { children: ReactNode }) {
-  const { accessToken } = useAuth();
+  const { accessToken, signOut } = useAuth();
   const [requests, setRequests] = useState<requestObject[]>([]);
   const [myRequests, setMyRequests] = useState<requestObject[]>([]);
   const [requestsForMyItems, setRequestsForMyItems] = useState<requestObject[]>(
@@ -49,6 +49,7 @@ export default function RequestProvider({ children }: { children: ReactNode }) {
           (T & { error?: string }) | null;
 
         if (!response.ok) {
+          if (response.status === 401 && accessToken) signOut();
           throw new Error(payload?.error ?? "Request operation failed.");
         }
 
@@ -61,7 +62,7 @@ export default function RequestProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    [accessToken],
+    [accessToken, signOut],
   );
 
   const getAllRequests = useCallback(async () => {

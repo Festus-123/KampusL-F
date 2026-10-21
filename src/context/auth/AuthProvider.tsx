@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { AppState } from "react-native";
 import { AuthContext, type AuthUser } from "./authContext";
 
 type AuthResponse = {
@@ -9,6 +10,31 @@ type AuthResponse = {
 };
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
+function getTokenExpirationTime(token: string): number | null {
+  try {
+    const encodedPayload = token.split(".")[1];
+    if (!encodedPayload) return null;
+
+    const base64Payload = encodedPayload
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")
+      .padEnd(Math.ceil(encodedPayload.length / 4) * 4, "=");
+    const binaryPayload = globalThis.atob(base64Payload);
+    const jsonPayload = decodeURIComponent(
+      Array.from(
+        binaryPayload,
+        (character) =>
+          `%${character.charCodeAt(0).toString(16).padStart(2, "0")}`,
+      ).join(""),
+    );
+    const payload = JSON.parse(jsonPayload) as { exp?: unknown };
+
+    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -66,11 +92,47 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return authenticate("signin", { email, password });
   }
 
-  function signOut() {
+  const signOut = useCallback(() => {
     setUser(null);
     setAccessToken(null);
     setRefreshToken(null);
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const expiresAt = getTokenExpirationTime(accessToken);
+    if (expiresAt === null) {
+      signOut();
+      return;
+    }
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const checkExpiration = () => {
+      if (timeout) clearTimeout(timeout);
+
+      const remainingTime = expiresAt - Date.now();
+      if (remainingTime <= 0) {
+        signOut();
+        return;
+      }
+
+      timeout = setTimeout(checkExpiration, remainingTime);
+    };
+
+    checkExpiration();
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      (state) => {
+        if (state === "active") checkExpiration();
+      },
+    );
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      appStateSubscription.remove();
+    };
+  }, [accessToken, signOut]);
 
   return (
     <AuthContext.Provider
