@@ -30,9 +30,9 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#85d5fb",
-          "image": "./assets/images/KampusLF.png",
+          "image": "./assets/images/KampusLF-app-icon.png",
           "dark": {
-            "image": "./assets/images/KampusLF.png",
+            "image": "./assets/images/KampusLF-app-icon.png",
             "backgroundColor": "#000000"
           },
           "imageWidth": 240
