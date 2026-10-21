@@ -21,7 +21,7 @@ const Search = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View className="flex-1 p-4 w-full">
+        <View className="flex-1 p-2 w-full">
           <View className="w-full">
             {/* Header */}
             <Text className="text-brand text-center text-4xl">Search</Text>
@@ -52,13 +52,6 @@ const Search = () => {
             onChangeText={setSearchWord}
           />
         </View>
-
-        {/* <TextInput
-          placeholder="Search item..."
-          className="w-full p-2 border"
-          value={searchWord}
-          onChangeText={setSearchWord}
-        /> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -28,7 +28,7 @@ const Add = () => {
     );
   }
   return (
-    <SafeAreaView className="flex-1 p-4" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 p-4 pb-4" edges={["top", "bottom"]}>
       <View className="flex-row items-center justify-between p-4">
         <View>
           <Text className="text-3xl text-brand font-bold text-slate-900">My items</Text>

@@ -7,7 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 const search = () => {
   return (
     <SafeAreaView className='flex-1'>
-      
        <Search />
     </SafeAreaView>
   )
