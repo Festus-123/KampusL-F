@@ -12,6 +12,7 @@ import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link, router } from "expo-router";
 import Toast from "react-native-toast-message";
+import GoBack from "@/components/go-back/GoBack";
 
 const profile = () => {
   const { user, signOut } = useAuth();
@@ -57,6 +58,7 @@ const profile = () => {
 
   return (
     <SafeAreaView className="flex-1 p-4 items-center">
+      <GoBack fallbackHref="/(tabs)" />
       {/* profile logo */}
       <View className="h-40 w-40 items-center justify-center rounded-full bg-brand mb-2">
         <Text className="text-8xl font-bold text-black">

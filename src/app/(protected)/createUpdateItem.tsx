@@ -2,17 +2,23 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import { Image as ExpoImage } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { File, Paths } from "expo-file-system";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import InputField from "@/components/input-field/InputField";
 import { useItems } from "@/hooks/items/useItems";
 import Toast from "react-native-toast-message";
 import Loading from "@/components/loading/Loading";
+import GoBack from "@/components/go-back/GoBack";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function CreateUpdateItem() {
   const { createLostItem, getLostItemById, updateLostItem, isLoading } =
@@ -27,6 +33,7 @@ export default function CreateUpdateItem() {
   const [image, setImage] = useState("");
   const [isLoadingItem, setIsLoadingItem] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPickingImage, setIsPickingImage] = useState(false);
 
   useEffect(() => {
     if (!itemId) return;
@@ -103,7 +110,9 @@ export default function CreateUpdateItem() {
       router.replace("/(tabs)");
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "An unexpected error occurred.";
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.";
       Toast.show({
         type: "error",
         text1: "Couldn't save item",
@@ -114,10 +123,57 @@ export default function CreateUpdateItem() {
     }
   }
 
-  const isBusy = isLoading || isLoadingItem || isSaving;
+  async function handlePickImage() {
+    if (Platform.OS === "web") {
+      Toast.show({
+        type: "info",
+        text1: "Use the mobile app",
+        text2: "Device photos can be stored from the installed app.",
+      });
+      return;
+    }
+
+    setIsPickingImage(true);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (result.canceled) return;
+
+      const asset = result.assets[0];
+      const extension = (
+        asset.mimeType?.split("/")[1] ??
+        asset.fileName?.split(".").pop() ??
+        "jpg"
+      )
+        .replace(/[^a-z0-9]/gi, "")
+        .toLowerCase();
+      const localFile = new File(
+        Paths.document,
+        `item-${Date.now()}.${extension || "jpg"}`,
+      );
+
+      await new File(asset.uri).copy(localFile);
+      setImage(localFile.uri);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Couldn't select image",
+        text2: error instanceof Error ? error.message : "Please try again.",
+      });
+    } finally {
+      setIsPickingImage(false);
+    }
+  }
+
+  const isBusy = isLoading || isLoadingItem || isSaving || isPickingImage;
 
   return (
     <SafeAreaView className="flex-1 bg-white " edges={["top"]}>
+      <GoBack fallbackHref="/(tabs)" />
       <ScrollView
         className="flex-1 py-8"
         contentContainerClassName="gap-5 p-5 "
@@ -159,15 +215,61 @@ export default function CreateUpdateItem() {
           className="min-h-24 py-3"
           editable={!isBusy}
         />
-        <InputField
-          label="Image URL"
-          value={image}
-          onChangeText={setImage}
-          placeholder="https://..."
-          autoCapitalize="none"
-          keyboardType="url"
-          editable={!isBusy}
-        />
+        <View className="gap-3">
+          <Text className="font-medium text-slate-900">Item photo</Text>
+          <View className="flex-row items-center gap-3">
+            <View className="h-24 w-24 overflow-hidden rounded-lg bg-slate-100">
+              {image ? (
+                <ExpoImage
+                  source={{ uri: image }}
+                  contentFit="cover"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <View className="flex-1 items-center justify-center">
+                  <Feather name="image" size={28} color="#94a3b8" />
+                </View>
+              )}
+            </View>
+            <View className="flex-1 gap-2">
+              <Pressable
+                accessibilityRole="button"
+                disabled={isBusy || Platform.OS === "web"}
+                onPress={() => void handlePickImage()}
+                className="min-h-11 flex-row items-center justify-center gap-2 rounded-lg bg-brand px-3"
+              >
+                <Feather name="image" size={18} color="#111827" />
+                <Text className="font-semibold text-slate-900">
+                  {isPickingImage ? "Opening photos..." : "Choose from device"}
+                </Text>
+              </Pressable>
+              {Platform.OS === "web" ? (
+                <Text className="text-xs text-slate-500">
+                  Device photo storage is available in the mobile app.
+                </Text>
+              ) : null}
+              {image ? (
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={isBusy}
+                  onPress={() => setImage("")}
+                  className="self-start px-2 py-1"
+                >
+                  <Text className="text-sm text-red-700">Remove photo</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+          <InputField
+            label="Or use an image URL"
+            value={image.startsWith("file://") ? "" : image}
+            onChangeText={setImage}
+            placeholder="https://..."
+            autoCapitalize="none"
+            keyboardType="url"
+            editable={!isBusy}
+          />
+        </View>
 
         <Pressable
           accessibilityRole="button"

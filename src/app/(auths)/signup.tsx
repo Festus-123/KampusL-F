@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 import InputField from "@/components/input-field/InputField";
+import GoBack from "@/components/go-back/GoBack";
 import { useAuth } from "@/hooks/auth/useAuth";
 import Loading from "@/components/loading/Loading";
 
@@ -41,7 +42,9 @@ const signup = () => {
   }
 
   return (
-    <View className="flex-1 bg-secondary px-5 pt-16 items-center justify-center">
+    <View className="flex-1 bg-secondary px-5 pt-16">
+      <GoBack fallbackHref="/" />
+      <View className="flex-1 items-center justify-center">
       <View className="mb-8 gap-4">
         <Text className="text-4xl text-brand font-extrabold">Welcome to KampusL&F</Text>
         <Text className="text-3xl font-bold text-slate-900 text-center">Create account</Text>
@@ -98,6 +101,7 @@ const signup = () => {
             </Pressable>
           </Link>
         </View>
+      </View>
       </View>
     </View>
   );

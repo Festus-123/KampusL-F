@@ -17,6 +17,7 @@ export default function ItemsProvider({ children }: { children: ReactNode }) {
   const [myItems, setMyItems] = useState<LostItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchCount, setSearchCount] = useState(0);
 
   const request = useCallback(async function request<T>(
     path: string,

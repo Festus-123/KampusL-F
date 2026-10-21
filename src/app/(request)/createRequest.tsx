@@ -6,6 +6,7 @@ import InputField from "@/components/input-field/InputField";
 import Loading from "@/components/loading/Loading";
 import { useRequest } from "@/hooks/requests/userRequest";
 import Toast from "react-native-toast-message";
+import GoBack from "@/components/go-back/GoBack";
 
 export default function CreateRequest() {
   const { createRequest, isLoading } = useRequest();
@@ -90,6 +91,7 @@ export default function CreateRequest() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+      <GoBack fallbackHref="/(tabs)" />
       <ScrollView
         className="flex-1"
         contentContainerClassName="gap-5 p-5"

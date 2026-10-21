@@ -6,6 +6,7 @@ import RequestsDisplay from "@/components/request-display/RequestsDisplay";
 import { useRequest } from "@/hooks/requests/userRequest";
 import Loading from "@/components/loading/Loading";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import GoBack from "@/components/go-back/GoBack";
 
 export default function MyRequests() {
   const { myRequests, isLoading, getMyRequests, deleteRequest } = useRequest();
@@ -51,8 +52,11 @@ export default function MyRequests() {
 
   return (
     <SafeAreaView className="flex-1 bg-white p-4" edges={["top"]}>
-      <View className="flex-row items-center justify-between px-4 pb-2 pt-3">
-        <Text className="text-4xl font-bold text-brand">My Requests</Text>
+      <View className="flex-row items-center justify-between gap-3 px-4 pb-2 pt-3">
+        <GoBack fallbackHref="/(tabs)" />
+        <Text className="flex-1 text-3xl font-bold text-brand">
+          My Requests
+        </Text>
         <Pressable
           accessibilityRole="button"
           onPress={() => void loadRequests()}

@@ -19,7 +19,9 @@ import { useRequest } from "@/hooks/requests/userRequest";
 const PAGE_SIZE = 12;
 
 type ItemsDisplayProps = {
-  mode?: "public" | "mine";
+  mode?: "public" | "mine" | "search";
+  searchWord?: string;
+  onSearchCountChange?: (count: number) => void;
 };
 
 type ReclaimState = {
@@ -27,19 +29,40 @@ type ReclaimState = {
   id: number | null;
 };
 
-const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
+const ItemsDisplay = ({
+  mode = "public",
+  searchWord = "",
+  onSearchCountChange,
+}: ItemsDisplayProps) => {
   const { user, accessToken } = useAuth();
   const [isReclaiming, setIsReclaiming] = useState<ReclaimState>({
     state: false,
     id: null,
   });
 
-  const { items, myItems, getLostItemsPage, getMyLostItems, deleteLostItem } =
-    useItems();
+  const {
+    items,
+    myItems,
+    getAllLostItems,
+    getLostItemsPage,
+    getMyLostItems,
+    deleteLostItem,
+  } = useItems();
 
   const { requests } = useRequest();
   const router = useRouter();
-  const displayedItems = mode === "mine" ? myItems : items;
+  const normalizedSearchWord = searchWord.trim().toLowerCase();
+  const searchResults = items.filter((item) =>
+    [
+      String(item.id),
+      `00${item.id}`,
+      item.name,
+      item.tag,
+      item.owner_name ?? "",
+    ].some((value) => value.toLowerCase().includes(normalizedSearchWord)),
+  );
+  const displayedItems =
+    mode === "mine" ? myItems : mode === "search" ? searchResults : items;
   const nextOffset = useRef(0);
   const isFetching = useRef(false);
   const hasMoreRef = useRef(true);
@@ -49,6 +72,10 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (mode === "search") onSearchCountChange?.(searchResults.length);
+  }, [mode, onSearchCountChange, searchResults.length]);
 
   const loadPage = useCallback(
     async (refresh = false) => {
@@ -111,10 +138,36 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
     [getMyLostItems],
   );
 
+  const loadSearchItems = useCallback(
+    async (refresh = false) => {
+      if (isFetching.current) return;
+      isFetching.current = true;
+      setError(null);
+      if (refresh) setIsRefreshing(true);
+      else setIsInitialLoading(true);
+
+      try {
+        await getAllLostItems();
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Could not load items.",
+        );
+      } finally {
+        isFetching.current = false;
+        setIsInitialLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [getAllLostItems],
+  );
+
   useEffect(() => {
     if (mode === "mine") void loadMine();
+    else if (mode === "search") void loadSearchItems();
     else void loadPage();
-  }, [loadMine, loadPage, mode]);
+  }, [loadMine, loadPage, loadSearchItems, mode]);
 
   const handleDelete = useCallback((id: number) => {
     setDeleteItemId(id);
@@ -178,7 +231,11 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={() =>
-          void (mode === "mine" ? loadMine(true) : loadPage(true))
+          void (mode === "mine"
+            ? loadMine(true)
+            : mode === "search"
+              ? loadSearchItems(true)
+              : loadPage(true))
         }
         ListEmptyComponent={
           isInitialLoading ? (
@@ -189,7 +246,11 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
               message={error}
               buttonLabel="Try again"
               directTo={() =>
-                void (mode === "mine" ? loadMine(true) : loadPage(true))
+                void (mode === "mine"
+                  ? loadMine(true)
+                  : mode === "search"
+                    ? loadSearchItems(true)
+                    : loadPage(true))
               }
             />
           ) : (
@@ -209,7 +270,11 @@ const ItemsDisplay = ({ mode = "public" }: ItemsDisplayProps) => {
               message={error}
               buttonLabel="Try again"
               directTo={() =>
-                void (mode === "mine" ? loadMine(true) : loadPage(true))
+                void (mode === "mine"
+                  ? loadMine(true)
+                  : mode === "search"
+                    ? loadSearchItems(true)
+                    : loadPage(true))
               }
             />
           ) : mode === "public" && hasMore && displayedItems.length > 0 ? (

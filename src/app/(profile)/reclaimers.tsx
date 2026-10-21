@@ -8,6 +8,7 @@ import Loading from "@/components/loading/Loading";
 import type { requestObject } from "@/context/requests/requestContext";
 import { useRequest } from "@/hooks/requests/userRequest";
 import { validateRequestDescriptions } from "@/lib/request-validator/RequestValidator";
+import GoBack from "@/components/go-back/GoBack";
 
 type PendingAction = {
   request: requestObject;
@@ -109,8 +110,9 @@ export default function Reclaimers() {
 
   return (
     <SafeAreaView className="flex-1 bg-white p-4" edges={["top"]}>
-      <View className="flex-row items-center justify-between px-4 pb-2 pt-3">
-        <Text className="text-4xl font-bold text-brand">Reclaimers</Text>
+      <View className="flex-row items-center justify-between gap-3 px-4 pb-2 pt-3">
+        <GoBack fallbackHref="/(tabs)" />
+        <Text className="flex-1 text-3xl font-bold text-brand">Reclaimers</Text>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Refresh reclaim requests"

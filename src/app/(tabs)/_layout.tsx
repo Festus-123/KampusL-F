@@ -1,4 +1,5 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Feather from "@expo/vector-icons/Feather";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Tabs } from "expo-router";
 
@@ -19,7 +20,7 @@ export default function TabLayout() {
               headerShown: false,
               title: "KampusLF",
               tabBarIcon: ({ color }) => (
-                <FontAwesome size={28} name="home" color={color} />
+                <Feather name="home" size={24} color="black" />
               ),
             }}
           />
@@ -38,7 +39,7 @@ export default function TabLayout() {
             options={{
               title: "Search",
               tabBarIcon: ({ color }) => (
-                <FontAwesome size={28} name="search" color={color} />
+                <EvilIcons name="search" size={24} color="black" />
               ),
             }}
           />
