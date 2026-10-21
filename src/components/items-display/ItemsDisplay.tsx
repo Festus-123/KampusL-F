@@ -173,16 +173,18 @@ const ItemsDisplay = ({
     setDeleteItemId(id);
   }, []);
 
-  const checkStateForReclaim = (itemId: number) => {
+  const checkStateForReclaim = (item: LostItem) => {
+    if (user?.id === item.user_id) return;
+
     if (!user || !accessToken) {
-      setIsReclaiming({ state: true, id: itemId });
+      setIsReclaiming({ state: true, id: item.id });
       return;
     }
 
     router.push({
       pathname: "/(request)/createRequest",
       params: {
-        id: String(itemId),
+        id: String(item.id),
       },
     });
 
@@ -193,7 +195,7 @@ const ItemsDisplay = ({
     ({ item }: { item: LostItem }) => (
       <ItemsCard
         item={item}
-        isOwner={mode === "mine"}
+        isOwner={Boolean(user && user.id === item.user_id)}
         onEdit={() =>
           router.push({
             pathname: "/(protected)/createUpdateItem",
@@ -201,7 +203,7 @@ const ItemsDisplay = ({
           })
         }
         onDelete={() => handleDelete(item.id)}
-        onClickReclaim={() => checkStateForReclaim(item.id)}
+        onClickReclaim={() => checkStateForReclaim(item)}
         requestCountOfItem={
           requests.filter((request) => request.item_id === item.id).length
         }
