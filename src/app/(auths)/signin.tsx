@@ -13,9 +13,10 @@ const signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, isLoading, user } = useAuth();
-  const { continueToCreate, continueToProfile } = useLocalSearchParams<{
+  const { continueToCreate, continueToProfile, itemId } = useLocalSearchParams<{
     continueToCreate?: string;
     continueToProfile?: string;
+    itemId?: string | string[];
   }>();
 
   const handleSignIn = async () => {
@@ -38,7 +39,10 @@ const signin = () => {
         continueToCreate === "1"
           ? "/(tabs)/add"
           : continueToCreate === "2"
-            ? "/(request)/createRequest"
+            ? {
+                pathname: "/(request)/createRequest",
+                params: { id: itemId },
+              }
             : continueToProfile === "1"
               ? "/(profile)/profile"
               : "/(tabs)",

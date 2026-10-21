@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Mobile-app",
-    "slug": "Mobile-app",
+    "name": "KampusLF",
+    "slug": "KampusLF",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/KampusLF-app-icon.png",
@@ -40,11 +40,11 @@
       ],
       [
         "expo-status-bar",
-      {
-        "hidden": false,
-        "style": "dark"
-      }
-    ]
+        {
+          "hidden": false,
+          "style": "dark"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -55,6 +55,12 @@
       "eas": {
         "projectId": "30bcf3d2-ed77-45e1-a763-167c54b555c1"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/30bcf3d2-ed77-45e1-a763-167c54b555c1"
     }
   }
 }

@@ -27,8 +27,18 @@ const Search = () => {
             <Text className="text-brand text-center text-4xl">Search</Text>
 
             {/* Search result */}
-            <View className="bg-brand min-h-20 p-4 w-full rounded-xl mt-4 items-start justify-center">
-              <Text className="tet-2xl">Search results: {searchCount}</Text>
+            <View className="bg-brand min-h-20 p-1 w-full rounded-xl mt-4 items-start justify-center">
+              {/* search bar */}
+              <View className="w-full z-30 border-[0.1px] rounded-xl flex flex-row items-center p-2 bg-white/90 backdrop-blur-md">
+                <EvilIcons name="search" size={24} color="black" className="" />
+                <TextInput
+                  placeholder="Search item..."
+                  className="w-full p-2"
+                  value={searchWord}
+                  onChangeText={setSearchWord}
+                />
+              </View>
+              <Text className={`tet-2xl ${searchCount === 0 ? "text-red-600" : "text-black"} mt-1 text-center p-2`}>Search results: {searchCount}</Text>
             </View>
           </View>
 
@@ -40,17 +50,6 @@ const Search = () => {
               onSearchCountChange={setSearchCount}
             />
           </View>
-        </View>
-
-        {/* search bar */}
-        <View className="w-full z-30 border rounded-xl flex flex-row items-center p-2 mb-10 bg-white/50 backdrop-blur-md">
-          <EvilIcons name="search" size={24} color="black" className="" />
-          <TextInput
-            placeholder="Search item..."
-            className="w-full p-2"
-            value={searchWord}
-            onChangeText={setSearchWord}
-          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
