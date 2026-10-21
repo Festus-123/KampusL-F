@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "KampusLF",
-    "slug": "KampusLF",
+    "name": "Mobile-app",
+    "slug": "Mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/KampusLF-app-icon.png",
